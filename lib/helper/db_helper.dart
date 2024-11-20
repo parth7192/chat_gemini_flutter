@@ -34,14 +34,14 @@ class DbHelper {
     );
   }
 
-  Future<void> insertAiData(HistoryModel historyModel) async {
+  Future<void> insertData(HistoryModel historyModel) async {
     database = await checkDB();
     database!.insert("ai", {
       "answer": historyModel.answer,
     });
   }
 
-  Future<List<HistoryModel>> readAiData() async {
+  Future<List<HistoryModel>> readData() async {
     database = await checkDB();
     String query = "SELECT * FROM ai";
     List<Map> data = await database!.rawQuery(query, null);
@@ -50,7 +50,7 @@ class DbHelper {
     return modelList;
   }
 
-  Future<void> deleteAiData({required String id}) async {
+  Future<void> deleteData({required String id}) async {
     database = await checkDB();
     database!.delete("ai", where: "id=?", whereArgs: [id]);
   }

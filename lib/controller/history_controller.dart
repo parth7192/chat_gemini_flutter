@@ -6,7 +6,7 @@ class HistoryController extends GetxController {
   RxList<HistoryModel> historyList = <HistoryModel>[].obs;
 
   Future<void> historyGetData() async {
-    List<HistoryModel> history = await DbHelper.helper.readAiData();
+    List<HistoryModel> history = await DbHelper.helper.readData();
     historyList.value = history;
   }
 }

@@ -35,61 +35,134 @@ class HomePage extends StatelessWidget {
         ],
       ),
       backgroundColor: Colors.white70,
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  return const Text("Hello");
-                },
-              ),
-            ),
-            TextFormField(
-              controller: txtedit,
-              decoration: InputDecoration(
-                labelText: "Tape Here",
-                labelStyle: const TextStyle(color: Colors.grey),
-                border: const OutlineInputBorder(),
-                filled: true,
-                fillColor: Colors.white,
-                suffixIcon: ValueListenableBuilder(
-                  valueListenable: isLoding,
-                  builder: (context, value, child) {
-                    if (value) {
-                      return const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: SpinKitThreeBounce(
-                          color: Colors.blue,
-                          size: 20,
-                        ),
-                      );
-                    }
-                    return IconButton(
-                      onPressed: () async {
-                        if (formKey.currentState!.validate()) {
-                          String edit = txtedit.text;
-                          controller.chatHistory.add(edit as GeminiModel);
-                          HistoryModel model =
-                              HistoryModel(answer: txtedit.text);
-                          DbHelper.helper.insertData(model);
-                          await controller
-                              .chatHistory(edit as List<GeminiModel>?);
-                          txtedit.clear();
-                          FocusScope.of(context).unfocus();
-                        }
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Expanded(
+                child: Obx(
+                  () {
+                    return ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: controller.geminiChatList.length,
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                offset: const Offset(3, 3),
+                                blurRadius: 5,
+                                spreadRadius: 3,
+                                color: Colors.grey.shade300,
+                              )
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(10),
+                          child: Column(
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.sizeOf(context).width *
+                                                0.7),
+                                    child: Text(
+                                      controller.geminiChatList[index].prompt,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.sizeOf(context).width *
+                                                0.7),
+                                    child: Text(controller
+                                        .geminiChatList[index].response),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
                       },
-                      icon: const Icon(Icons.send),
                     );
                   },
                 ),
               ),
-            ),
-          ],
-        ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                child: Form(
+                  key: formKey,
+                  child: TextFormField(
+                    onFieldSubmitted: (value) {
+                      controller.fatchData(prompt: value.toString());
+                    },
+                    controller: txtedit,
+                    decoration: InputDecoration(
+                      labelText: "Tape Here",
+                      labelStyle: const TextStyle(color: Colors.grey),
+                      border: const OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                      suffixIcon: ValueListenableBuilder(
+                        valueListenable: isLoding,
+                        builder: (context, value, child) {
+                          if (value) {
+                            return const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: SpinKitThreeBounce(
+                                color: Colors.blue,
+                                size: 20,
+                              ),
+                            );
+                          }
+                          return IconButton(
+                            onPressed: () async {
+                              if (formKey.currentState!.validate()) {
+                                String edit = txtedit.text;
+                                controller.fatchData(prompt: txtedit.text);
+                                txtedit.clear();
+                                FocusScope.of(context).unfocus();
+                              }
+                            },
+                            icon: const Icon(Icons.send),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Obx(
+            () => !controller.isLoading.value
+                ? Center(
+                    child: CircleAvatar(
+                      backgroundColor: Colors.green.withOpacity(0.6),
+                      child: Transform.scale(
+                        scale: 0.5,
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 5,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          )
+        ],
       ),
     );
   }

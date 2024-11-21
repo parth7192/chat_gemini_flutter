@@ -11,15 +11,13 @@ class GeminiHelper {
   Future<String> fatchData({required String prompt}) async {
     Map<String, String> header = {"Content-Type": "application/json"};
     var body = {
-      {
-        "contents": [
-          {
-            "parts": [
-              {"text": prompt}
-            ]
-          }
-        ]
-      }
+      "contents": [
+        {
+          "parts": [
+            {"text": prompt}
+          ]
+        }
+      ]
     };
 
     try {
@@ -29,9 +27,11 @@ class GeminiHelper {
         body: jsonEncode(body),
       );
       if (response.statusCode == 200) {
-        return jsonDecode(response.body)['candidates'][0]['content']['parts'][0]
-                ['text']
-            .toString();
+        var data = jsonDecode(response.body);
+        String message =
+            data['candidates'][0]['content']['parts'][0]['text'].toString();
+
+        return message;
       }
     } catch (e) {
       print(

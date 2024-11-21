@@ -4,11 +4,14 @@ import 'package:get/get.dart';
 
 class GeminiController extends GetxController {
   RxBool isLoading = false.obs;
-  RxList<GeminiModel> chatHistory = <GeminiModel>[].obs;
+  RxList<GeminiModel> geminiChatList = <GeminiModel>[].obs;
 
   Future<void> fatchData({required String prompt}) async {
-    isLoading.value = true;
+    isLoading(true);
     String data = await GeminiHelper.instance.fatchData(prompt: prompt);
-    chatHistory.add(GeminiModel(prompt: prompt, response: data));
+    geminiChatList.add(
+      GeminiModel(prompt: prompt, response: data),
+    );
+    isLoading(false);
   }
 }
